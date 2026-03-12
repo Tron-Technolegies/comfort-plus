@@ -5,8 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 
 
+
+
+# .....................view user..........................
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def view_users(request):
     signup_users = User.objects.all()
     users = []
@@ -14,6 +16,6 @@ def view_users(request):
     for user in signup_users:
         users.append({
             'Name': user.username,
-            'Eamil': user.email,
+            'Email': user.email,
         })
-    return JsonResponse(users)
+    return JsonResponse(users, safe=False)
