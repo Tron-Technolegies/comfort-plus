@@ -83,6 +83,11 @@ DATABASES = {
         'PORT': 5432,
         'USER': 'postgres',
         'PASSWORD': 'admin',
+        'NAME':'ComfortPlus_db',
+        'HOST':'localhost',
+        'PORT':'5432',
+        'USER':'postgres',
+        'PASSWORD':'admin'
     }
 }
 
