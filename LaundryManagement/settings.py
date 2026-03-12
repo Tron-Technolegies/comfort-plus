@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'AdminApp',
     'UserApp',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,11 @@ WSGI_APPLICATION = 'LaundryManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ComfortPlus',
+        'HOST': 'localhost',
+        'PORT': 5432,
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
         'NAME':'ComfortPlus_db',
         'HOST':'localhost',
         'PORT':'5432',
