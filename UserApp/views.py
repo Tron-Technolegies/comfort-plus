@@ -4,10 +4,6 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from UserApp.models import  Profile
 
-
-
-
-
 # Create your views here.
 
 @csrf_exempt
