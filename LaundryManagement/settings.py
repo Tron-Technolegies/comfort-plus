@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     'AdminApp',
     'UserApp',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,7 +86,7 @@ WSGI_APPLICATION = 'LaundryManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ComfortPlus',
+        'NAME': 'ComfortPlus_db',
         'HOST': 'localhost',
         'PORT': 5432,
         'USER': 'postgres',
