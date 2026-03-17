@@ -187,7 +187,7 @@ def view_single_service(request,id):
 
 #*************************SCHEDEULE*****************************
 
-#SCHEDULE_FORM
+#SERVICE_BOOKING
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -219,7 +219,7 @@ def place_order(request):
     return JsonResponse({"message": "Success"})
 
     
-#VIEW_SCHEDULE
+#VIEW_ORDER
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -260,6 +260,8 @@ def send_message(request):
         message=rmessage
     )
     return HttpResponse("Success")
+
+
 
 
 
