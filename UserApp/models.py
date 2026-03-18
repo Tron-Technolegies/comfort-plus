@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 # Create your models here.
 
@@ -19,8 +20,8 @@ class Service_Booking(models.Model):
     service = models.CharField(max_length=100)
     date = models.DateField()
     time = models.TimeField()
-    category=models.TextField(default="null")
-
+    Delivery_mode = models.CharField(max_length=10,choices=[('Normal', 'Normal'),('Express', 'Express')],default='null')#→ value stored in the database→ value shown in forms
+    order_id=models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
 
 
 class Message(models.Model):

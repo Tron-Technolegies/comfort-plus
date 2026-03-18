@@ -25,5 +25,11 @@ urlpatterns = [
 #***********************MESSAGE**************************
 
     path("send_message",views.send_message,name="send_message"),
+
+#*************************RESET PASSWORD****************************
+    # path("reset_password",views.reset_password,name="reset_password"),
+
+
+
     
 ]
