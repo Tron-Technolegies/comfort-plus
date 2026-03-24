@@ -10,4 +10,15 @@ urlpatterns= [
     path('edit_service/<int:id>', views.edit_service, name='edit_service'),
     path('delete_service/<int:id>', views.delete_service, name='delete_service'),
 
+    path('view_orders/', views.view_orders, name='view_orders'),
+    path('view_user_orders/<int:id>', views.view_user_orders, name='view_user_orders'),
+    path('view_user_order/<int:id>', views.view_user_order, name='view_user_order'),
+
+    path('add_staff/', views.add_staff, name='add_staff'),
+    path('view_all_staff/', views.view_all_staff, name='view_all_staff'),
+    path('view_single_staff/<int:id>', views.view_single_staff, name='view_single_staff'),
+    path('remove_staff/<int:id>', views.remove_staff, name='remove_staff'),
+    path('edit_staff/<int:id>', views.edit_staff, name='edit_staff'),
+
+
 ]

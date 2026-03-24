@@ -6,7 +6,8 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 
-from AdminApp.models import Services
+from AdminApp.models import Services, Staff
+from UserApp.models import Service_Booking
 
 
 @api_view(["POST"])
@@ -37,42 +38,46 @@ def add_service(request):
         return HttpResponse(str(e), status=500)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def view_services(request):
     services = Services.objects.all()
     new_list = []
 
     for i in services:
-        new_list.append({
-            "id": i.id,
-            "s_nme": i.service_type,
-            "disc": i.description,
-            "pr": i.price,
-            "estimated_t": i.estimated_time,
-            "is_avail": i.is_available,
-            "cr_at": i.created_at,
-            "up_st": i.updated_at
-        })
+        new_list.append(
+            {
+                "id": i.id,
+                "s_nme": i.service_type,
+                "disc": i.description,
+                "pr": i.price,
+                "estimated_t": i.estimated_time,
+                "is_avail": i.is_available,
+                "cr_at": i.created_at,
+                "up_st": i.updated_at,
+            }
+        )
     return JsonResponse(new_list, safe=False)
 
-@api_view(['GET'])
-def v_single_services(request,id):
-    data =  get_object_or_404(Services,id=id)
+
+@api_view(["GET"])
+def v_single_services(request, id):
+    data = get_object_or_404(Services, id=id)
     service = {
-                "id": data.id,
-                "s_nme": data.service_type,
-                "disc": data.description,
-                "pr": data.price,
-                "estimated_t": data.estimated_time,
-                "is_avail": data.is_available,
-                "cr_at": data.created_at,
-                "up_st": data.updated_at
-              }
+        "id": data.id,
+        "s_nme": data.service_type,
+        "disc": data.description,
+        "pr": data.price,
+        "estimated_t": data.estimated_time,
+        "is_avail": data.is_available,
+        "cr_at": data.created_at,
+        "up_st": data.updated_at,
+    }
     return JsonResponse(service)
 
+
 @csrf_exempt
-def edit_service(request,id):
-    if request.method == 'GET':
+def edit_service(request, id):
+    if request.method == "GET":
         s_data = Services.objects.get(id=id)
         single_data = {
             "id": s_data.id,
@@ -82,28 +87,30 @@ def edit_service(request,id):
             "estimated_t": s_data.estimated_time,
             "is_avail": s_data.is_available,
             "cr_at": s_data.created_at,
-            "up_st": s_data.updated_at
+            "up_st": s_data.updated_at,
         }
         return JsonResponse(single_data)
-    
-    elif request.method == 'POST':
+
+    elif request.method == "POST":
         s_data = Services.objects.get(id=id)
-        s_data.service_type = request.POST.get('s_nme', )
-        s_data.description = request.POST.get('disc', s_data.description)
-        s_data.price = request.POST.get('s_pr', s_data.price)
-        s_data.estimated_time = request.POST.get('est_t', s_data.estimated_time)
-        s_data.is_available = request.POST.get('is_avl', s_data.is_available)
-        s_data.updated_at = request.POST.get('up_at', s_data.updated_at)
+        s_data.service_type = request.POST.get("s_nme",)
+        s_data.description = request.POST.get("disc", s_data.description)
+        s_data.price = request.POST.get("s_pr", s_data.price)
+        s_data.estimated_time = request.POST.get("est_t", s_data.estimated_time)
+        s_data.is_available = request.POST.get("is_avl", s_data.is_available)
+        s_data.updated_at = request.POST.get("up_at", s_data.updated_at)
         s_data.save()
-        return HttpResponse("updated successfully",status=201)
-    
+        return HttpResponse("updated successfully", status=201)
+
     return JsonResponse("completed")
 
-@api_view(['DELETE'])
-def delete_service(request,id):
-        data = Services.objects.get(id=id)
-        data.delete()
-        return JsonResponse({'message':'successfully deleted'})
+
+@api_view(["DELETE"])
+def delete_service(request, id):
+    data = Services.objects.get(id=id)
+    data.delete()
+    return JsonResponse({"message": "successfully deleted"})
+
 
 # .....................view user..........................
 @api_view(["GET"])
@@ -119,3 +126,135 @@ def view_users(request):
             }
         )
     return JsonResponse(users, safe=False)
+
+
+# ..................view order...................
+@api_view(["GET"])
+def view_orders(request):
+    schedule = Service_Booking.objects.filter()
+    data = []
+    for i in schedule:
+        data.append(
+            {
+                "full_name": i.full_name,
+                "phone": i.phone,
+                "email": i.email,
+                "street_address": i.street_address,
+                "city": i.city,
+                "zipcode": i.zipcode,
+                "service": i.service,
+                "date": i.date,
+                "time": i.time,
+            }
+        )
+    return JsonResponse(data, safe=False)
+
+
+@api_view(["GET"])
+def view_user_orders(request, id):
+    orders = Service_Booking.objects.filter(user_id = id)
+    data = []
+    for i in orders:
+        data.append(
+            {
+                "full_name": i.full_name,
+                "phone": i.phone,
+                "email": i.email,
+                "street_address": i.street_address,
+                "city": i.city,
+                "zipcode": i.zipcode,
+                "service": i.service,
+                "date": i.date,
+                "time": i.time,
+            }
+        )
+    return JsonResponse(data, safe=False)
+
+@api_view(["GET"])
+def view_user_order(request, id):
+    orders = get_object_or_404(Service_Booking, id=id)
+    data = {
+        "full_name": orders.full_name,
+        "phone": orders.phone,
+        "email": orders.email,
+        "street_address": orders.street_address,
+        "city": orders.city,
+        "zipcode": orders.zipcode,
+        "service": orders.service,
+        "date": orders.date,
+        "time": orders.time,
+    }
+    return JsonResponse(data, safe=False)
+# ................... Staff Recruiting ..................
+@api_view(['POST'])
+def add_staff(request):
+    r_name = request.POST.get('name')
+    r_phone = request.POST.get('phone')
+    r_email = request.POST.get('email')
+    r_role = request.POST.get('role')
+
+    Staff.objects.create(
+        name = r_name,
+        phone = r_phone,
+        email = r_email,
+        role = r_role
+    )
+    return JsonResponse({'message': 'Added successfully'})
+
+
+@api_view(['GET'])
+def view_all_staff(request):
+    all_staff = Staff.objects.all()
+    staff = []
+
+    for i in all_staff:
+        staff.append({
+            'name': i.name,
+            'phone': i.phone,
+            'email': i.email,
+            'role': i.role
+        })
+    return JsonResponse(staff, safe=False)
+
+
+@api_view(['GET'])
+def view_single_staff(request, id):
+    data = Staff.objects.get(id=id)
+    single_staff = ({
+            'name': data.name,
+            'phone': data.phone,
+            'email': data.email,
+            'role': data.role
+        })
+    return JsonResponse(single_staff)
+
+@api_view(['DELETE'])
+def remove_staff(request, id):
+    data = Staff.objects.get(id=id)
+    data.delete()
+    return JsonResponse({'message':'successfully removed'})
+
+
+@csrf_exempt
+def edit_staff(request, id):
+    if request.method == "GET":
+        data = Staff.objects.get(id=id)
+        single_data = {
+            'name': data.name,
+            'phone': data.phone,
+            'email': data.email,
+            'role': data.role
+        }
+        return JsonResponse(single_data)
+
+    elif request.method == "POST":
+        data = Staff.objects.get(id=id)
+        data.name = request.POST.get("name", data.name)
+        data.phone = request.POST.get("phone", data.phone)
+        data.email = request.POST.get("email", data.email)
+        data.role = request.POST.get("role", data.role)
+        data.save()
+        return HttpResponse("updated successfully", status=201)
+
+    return JsonResponse("completed")
+
