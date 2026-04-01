@@ -9,9 +9,10 @@ class Services(models.Model):
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    features = models.JSONField(default=list)
         
     def __str__(self):
-        return self.name
+        return self.service_type
     
 
 class Staff(models.Model):
@@ -19,3 +20,9 @@ class Staff(models.Model):
     phone = models.CharField(max_length=15)
     email = models.EmailField()
     role = models.CharField(max_length=20)
+
+
+class Item_Price(models.Model):
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)
+    item = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)

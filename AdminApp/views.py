@@ -6,7 +6,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 
-from AdminApp.models import Services, Staff
+from AdminApp.models import Item_Price, Services, Staff
 from UserApp.models import Service_Booking
 
 
@@ -19,6 +19,7 @@ def add_service(request):
     available = request.POST.get("is_available") == "True"
     created_at = request.POST.get("created_at")
     updated_at = request.POST.get("updated_at")
+    features = request.POST.get("feature")
 
     if not service_nme or not s_price:
         return HttpResponse("its a mandatory field", status=400)
@@ -32,6 +33,7 @@ def add_service(request):
             is_available=available,
             created_at=created_at,
             updated_at=updated_at,
+            features=features,
         )
         return HttpResponse("create successfully", status=201)
     except Exception as e:
@@ -54,6 +56,7 @@ def view_services(request):
                 "is_avail": i.is_available,
                 "cr_at": i.created_at,
                 "up_st": i.updated_at,
+                "ftr":i.features
             }
         )
     return JsonResponse(new_list, safe=False)
@@ -71,6 +74,7 @@ def v_single_services(request, id):
         "is_avail": data.is_available,
         "cr_at": data.created_at,
         "up_st": data.updated_at,
+        "ftr":data.features
     }
     return JsonResponse(service)
 
@@ -88,6 +92,7 @@ def edit_service(request, id):
             "is_avail": s_data.is_available,
             "cr_at": s_data.created_at,
             "up_st": s_data.updated_at,
+            "ftr":s_data.features
         }
         return JsonResponse(single_data)
 
@@ -99,6 +104,7 @@ def edit_service(request, id):
         s_data.estimated_time = request.POST.get("est_t", s_data.estimated_time)
         s_data.is_available = request.POST.get("is_avl", s_data.is_available)
         s_data.updated_at = request.POST.get("up_at", s_data.updated_at)
+        s_data.features = request.POST.get("ftr", s_data.features)
         s_data.save()
         return HttpResponse("updated successfully", status=201)
 
@@ -258,3 +264,76 @@ def edit_staff(request, id):
 
     return JsonResponse("completed")
 
+# ..................items to service.................
+@api_view(['POST'])
+def add_item(request, id):
+    item = request.POST.get("item")
+    price = request.POST.get("price")
+
+    if not item or not price:
+        return HttpResponse("its a mandatory field", status=400)
+
+    try:
+        Item_Price.objects.create(
+            service_id = id,
+            item = item,
+            price = price,
+        )
+        return HttpResponse("create successfully", status=201)
+    except Exception as e:
+        return HttpResponse(str(e), status=500)
+    
+
+@api_view(['GET'])
+def view_items(request):
+    items = Item_Price.objects.all()
+    new_list = []
+
+    for i in items:
+        new_list.append(
+            {
+                'item': i.item,
+                'price': i.price,
+                's_id': i.service.id
+            }
+        )
+    return JsonResponse(new_list, safe=False)
+
+
+@api_view(['GET'])
+def view_single_item(request, id):
+    data = get_object_or_404(Item_Price, id=id)
+
+    item = {
+        'item': data.item,
+        'price': data.price,
+        's_id': data.service.id
+        }
+    return JsonResponse(item)
+
+@csrf_exempt
+def edit_service_item(request, id):
+    if request.method == 'GET':
+        data = Item_Price.objects.get(id=id)
+        single_data = {
+            'item': data.item,
+            'price': data.price,
+            's_id': data.service.id
+        }
+        return JsonResponse(single_data)
+    
+    elif request.method == 'POST':
+        data = Item_Price.objects.get(id=id)
+        data.item = request.POST.get('item', data.item)
+        data.price = request.POST.get('price', data.price)
+        data.service.id = request.POST.get('s_id', data.service.id)
+        data.save()
+        return HttpResponse("updated successfully", status=201)
+    return JsonResponse('completed')
+
+
+@api_view(['DELETE'])
+def delete_service_item(request, id):
+    data = Item_Price.objects.get(id=id)
+    data.delete()
+    return JsonResponse({"message": "successfully deleted"})
