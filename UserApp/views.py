@@ -119,20 +119,19 @@ def update_profile(request):
     try:
         profile = user.profile
     except ObjectDoesNotExist:
-        # Optionally, create profile if missing
+    
         profile = Profile.objects.create(user=user)
 
-    # Update username
+    
     user.username = request.data.get("name", user.username)
 
-    # Update email safely
     new_email = request.data.get("email", user.email)
     if User.objects.filter(email=new_email).exclude(id=user.id).exists():
         return JsonResponse({"message": "Email already exists"}, status=400)
     user.email = new_email
     user.save()
 
-    # Update phone
+   
     profile.Phone = request.data.get("phone", profile.Phone)
     profile.save()
 
@@ -202,6 +201,7 @@ def place_order(request):
     rservice_type = request.data.get("service")
     rdate = request.data.get("date")
     rtime = request.data.get("time")
+    rdelivery_mode = request.data.get("delivery_mode")
 
     Service_Booking.objects.create(
         user=request.user,
@@ -213,7 +213,8 @@ def place_order(request):
         zipcode=rzipcode,
         service=rservice_type,
         date=rdate,
-        time=rtime
+        time=rtime,
+        Delivery_mode=rdelivery_mode
     )
 
     return JsonResponse({"message": "Success"})
@@ -261,27 +262,22 @@ def send_message(request):
     )
     return HttpResponse("Success")
 
+#RESET_PASSWORD
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def reset_password(request):
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#     password=request.data.get("current password")
+#     new_password=request.data.get("new_password")
+#     confirm_password=request.data.get("confirm_password")
+#     user = request.user
+#     if not User.check_password(password):
+#      return HttpResponse("Incorrect password")
+#     if new_password != confirm_password:
+#        return HttpResponse("Passwords do not match")
+# # set new password
+#     user.set_password(new_password)
+#     user.save()
+    # return JsonResponse({"message":"success"})
 
