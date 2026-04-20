@@ -18,7 +18,7 @@ urlpatterns= [
     path('view_all_staff/', views.view_all_staff, name='view_all_staff'),
     path('view_single_staff/<int:id>', views.view_single_staff, name='view_single_staff'),
     path('remove_staff/<int:id>', views.remove_staff, name='remove_staff'),
-    path('edit_staff/<int:id>', views.edit_staff, name='edit_staff'),
+    path('edit_staff/<int:id>/', views.edit_staff, name='edit_staff'),
 
     path('add_item/<int:id>', views.add_item, name='add_item'),
     path('view_items', views.view_items, name='view_items'),

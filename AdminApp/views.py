@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from AdminApp.models import Item_Price, Services, Staff
 from UserApp.models import Service_Booking
-
+import json
 
 @api_view(["POST"])
 def add_service(request):
@@ -215,6 +215,7 @@ def view_all_staff(request):
 
     for i in all_staff:
         staff.append({
+            'id': i.id,
             'name': i.name,
             'phone': i.phone,
             'email': i.email,
@@ -253,12 +254,15 @@ def edit_staff(request, id):
         }
         return JsonResponse(single_data)
 
-    elif request.method == "POST":
+    elif request.method == "PUT":
+
+        body = json.loads(request.body)
+
         data = Staff.objects.get(id=id)
-        data.name = request.POST.get("name", data.name)
-        data.phone = request.POST.get("phone", data.phone)
-        data.email = request.POST.get("email", data.email)
-        data.role = request.POST.get("role", data.role)
+        data.name = body.get("name", data.name)
+        data.phone = body.get("phone", data.phone)
+        data.email = body.get("email", data.email)
+        data.role = body.get("role", data.role)
         data.save()
         return HttpResponse("updated successfully", status=201)
 
