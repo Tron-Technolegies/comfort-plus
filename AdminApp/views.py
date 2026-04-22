@@ -194,19 +194,32 @@ def view_user_order(request, id):
 # ................... Staff Recruiting ..................
 @api_view(['POST'])
 def add_staff(request):
-    r_name = request.POST.get('name')
-    r_phone = request.POST.get('phone')
-    r_email = request.POST.get('email')
-    r_role = request.POST.get('role')
+    try:
+        data = request.data
 
-    Staff.objects.create(
-        name = r_name,
-        phone = r_phone,
-        email = r_email,
-        role = r_role
-    )
-    return JsonResponse({'message': 'Added successfully'})
+        name = data.get('name')
+        phone = data.get('phone')
+        email = data.get('email')
+        role = data.get('role')
 
+        if not name or not phone or not email or not role:
+            return JsonResponse({'error': 'All fields are required'}, status=400)
+
+        if Staff.objects.filter(email=email).exists():
+            return JsonResponse({'error': 'Email already exists'}, status=400)
+
+        Staff.objects.create(
+            name=name,
+            phone=phone,
+            email=email,
+            role=role
+        )
+
+        return JsonResponse({'message': 'Added successfully'}, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
 
 @api_view(['GET'])
 def view_all_staff(request):
@@ -219,7 +232,8 @@ def view_all_staff(request):
             'name': i.name,
             'phone': i.phone,
             'email': i.email,
-            'role': i.role
+            'role': i.role,
+            'status':i.status
         })
     return JsonResponse(staff, safe=False)
 
@@ -250,7 +264,8 @@ def edit_staff(request, id):
             'name': data.name,
             'phone': data.phone,
             'email': data.email,
-            'role': data.role
+            'role': data.role,
+            'status': data.status
         }
         return JsonResponse(single_data)
 
@@ -263,6 +278,7 @@ def edit_staff(request, id):
         data.phone = body.get("phone", data.phone)
         data.email = body.get("email", data.email)
         data.role = body.get("role", data.role)
+        data.status = body.get("status", data.status)
         data.save()
         return HttpResponse("updated successfully", status=201)
 

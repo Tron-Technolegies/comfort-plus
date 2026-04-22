@@ -21,6 +21,13 @@ class Staff(models.Model):
     email = models.EmailField()
     role = models.CharField(max_length=20)
 
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Inactive', 'Inactive'),
+    ]
+
+    status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='Active')
+    
 
 class Item_Price(models.Model):
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
