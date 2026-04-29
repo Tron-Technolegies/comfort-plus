@@ -12,14 +12,13 @@ import json
 
 @api_view(["POST"])
 def add_service(request):
-    service_nme = request.POST.get("s_name")
-    disc = request.POST.get("discription")
-    s_price = request.POST.get("s_prc")
-    estimated_t = request.POST.get("est_time")
-    available = request.POST.get("is_available") == "True"
-    created_at = request.POST.get("created_at")
-    updated_at = request.POST.get("updated_at")
-    features = request.POST.get("feature")
+    service_nme = request.data.get("s_name")
+    desc = request.data.get("discription")
+    s_price = request.data.get("s_prc")
+    estimated_t = request.data.get("est_time")
+    available = request.data.get("is_available") == "True"
+    features = request.data.get("feature")
+
 
     if not service_nme or not s_price:
         return HttpResponse("its a mandatory field", status=400)
@@ -27,12 +26,10 @@ def add_service(request):
     try:
         Services.objects.create(
             service_type=service_nme,
-            description=disc,
+            description=desc,
             price=s_price,
             estimated_time=estimated_t,
             is_available=available,
-            created_at=created_at,
-            updated_at=updated_at,
             features=features,
         )
         return HttpResponse("create successfully", status=201)
@@ -96,15 +93,17 @@ def edit_service(request, id):
         }
         return JsonResponse(single_data)
 
-    elif request.method == "POST":
+    elif request.method == "PUT":
+        body = json.loads(request.body)
+
         s_data = Services.objects.get(id=id)
-        s_data.service_type = request.POST.get("s_nme",)
-        s_data.description = request.POST.get("disc", s_data.description)
-        s_data.price = request.POST.get("s_pr", s_data.price)
-        s_data.estimated_time = request.POST.get("est_t", s_data.estimated_time)
-        s_data.is_available = request.POST.get("is_avl", s_data.is_available)
-        s_data.updated_at = request.POST.get("up_at", s_data.updated_at)
-        s_data.features = request.POST.get("ftr", s_data.features)
+        s_data.service_type = body.get("s_nme", s_data.service_type)
+        s_data.description = body.get("disc", s_data.description)
+        s_data.price = body.get("s_pr", s_data.price)
+        s_data.estimated_time = body.get("est_t", s_data.estimated_time)
+        s_data.is_available = body.get("is_avl", s_data.is_available)
+        s_data.updated_at = body.get("up_at", s_data.updated_at)
+        s_data.features = body.get("ftr", s_data.features)
         s_data.save()
         return HttpResponse("updated successfully", status=201)
 
@@ -287,8 +286,10 @@ def edit_staff(request, id):
 # ..................items to service.................
 @api_view(['POST'])
 def add_item(request, id):
-    item = request.POST.get("item")
-    price = request.POST.get("price")
+    item = request.data.get("item")
+    price = request.data.get("price")
+
+    print("Received:", item, price, id)
 
     if not item or not price:
         return HttpResponse("its a mandatory field", status=400)
@@ -301,20 +302,23 @@ def add_item(request, id):
         )
         return HttpResponse("create successfully", status=201)
     except Exception as e:
+        print("DB Error:", e)
         return HttpResponse(str(e), status=500)
     
 
 @api_view(['GET'])
 def view_items(request):
-    items = Item_Price.objects.all()
+    items = Item_Price.objects.all().order_by('id')
     new_list = []
 
     for i in items:
         new_list.append(
             {
+                'id': i.id,
                 'item': i.item,
                 'price': i.price,
-                's_id': i.service.id
+                's_id': i.service.id,
+                'service_name': i.service.service_type,
             }
         )
     return JsonResponse(new_list, safe=False)
@@ -342,11 +346,13 @@ def edit_service_item(request, id):
         }
         return JsonResponse(single_data)
     
-    elif request.method == 'POST':
+    elif request.method == 'PUT':
+        body = json.loads(request.body)
+
         data = Item_Price.objects.get(id=id)
-        data.item = request.POST.get('item', data.item)
-        data.price = request.POST.get('price', data.price)
-        data.service.id = request.POST.get('s_id', data.service.id)
+        data.item = body.get('item', data.item)
+        data.price = body.get('price', data.price)
+        data.service_id = body.get('s_id', data.service_id)
         data.save()
         return HttpResponse("updated successfully", status=201)
     return JsonResponse('completed')
