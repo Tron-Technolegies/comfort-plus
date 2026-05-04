@@ -10,6 +10,40 @@ from AdminApp.models import Item_Price, Services, Staff
 from UserApp.models import Service_Booking
 import json
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+
+# ..............Admin_login...........
+@api_view(['POST'])
+def admin_login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+
+    if not username or not password:
+        return Response({"error": "Username and password required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = authenticate(username=username, password=password)
+    
+    
+    if user is None:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not user.is_superuser:
+        return Response({"error": "Access denied. Admins only."}, status=status.HTTP_403_FORBIDDEN)
+
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "is_admin": True,
+        "username": user.username
+    })
+
+# ............service.................
 @api_view(["POST"])
 def add_service(request):
     service_nme = request.data.get("s_name")
@@ -126,8 +160,10 @@ def view_users(request):
     for user in signup_users:
         users.append(
             {
+                "id": user.id,
                 "Name": user.username,
                 "Email": user.email,
+                "Phone": user.profile.Phone if hasattr(user, "profile") else None,
             }
         )
     return JsonResponse(users, safe=False)
